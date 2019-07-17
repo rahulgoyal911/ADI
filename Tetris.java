@@ -14,6 +14,17 @@ class Versions extends Points {
     public void changeVer(int verNo) {
         this.verNo = verNo;
     }
+    public void generateVer() {
+    }
+    public boolean checkDown(char board[][]) {
+        return false;
+    }
+    public boolean checkLeft(char board[][]) {
+        return false;
+    }
+    public boolean checkRight(char board[][]) {
+        return false;
+    }
 }
 class Line extends Versions {
     Line() {
@@ -29,6 +40,21 @@ class Line extends Versions {
             yCord[i] = tempVar;
         }
     }
+    public void generateVer() {
+        xCord = new int[] {1, 2, 3, 4};
+        yCord = new int[] {1, 1, 1, 1};
+    }
+    public boolean checkDown(char board[][]) {
+        if(verNo == 1 && (board[xCord[3] + 1][yCord[3]] == '#')) {
+            return true;
+        } else if(verNo == 2 && ( board[xCord[0] + 1][yCord[0]] == '#' 
+        || board[xCord[1] + 1][yCord[1]] == '#' || 
+        board[xCord[2] + 1][yCord[2]] == '#' 
+        || board[xCord[3] + 1][yCord[3]] == '#')) {
+            return true;
+        }
+        return false;
+    }
 }
 
 class Square extends Versions {
@@ -38,6 +64,16 @@ class Square extends Versions {
     }
     public void changeVer(int verNo) {
         super.changeVer(verNo);
+    }
+    public void generateVer() {
+        xCord = new int[] {1, 1, 2, 2};
+        yCord = new int[] {1, 2, 1, 2};
+    }
+    public boolean checkDown(char board[][]) {
+        if(board[xCord[2] + 1][yCord[2]] == '#' || board[xCord[3] + 1][yCord[3]] == '#') {
+            return true;
+        } 
+        return false;
     }
 }
 
@@ -90,6 +126,25 @@ class T extends Versions {
             }
             yCord[length - 1] = xCord[length - 1];
         }
+    }
+    public void generateVer() {
+        xCord = new int[] {1, 1, 1, 2};
+        yCord = new int[] {1, 2, 3, 2};
+    }
+    public boolean checkDown(char board[][]) {
+        if(verNo == 1 && (board[xCord[0] + 1][yCord[0]] == '#' 
+        || board[xCord[2] + 1][yCord[2]] == '#' || board[xCord[3] + 1][yCord[3]] == '#')) {
+            return true;
+        } else if(verNo == 2 && ( board[xCord[2] + 1][yCord[2]] == '#' 
+        || board[xCord[3] + 1][yCord[3]] == '#')) {
+            return true;
+        } else if(verNo == 3 && (board[xCord[0] + 1][yCord[0]] == '#' 
+        || board[xCord[1] + 1][yCord[1]] == '#' || board[xCord[2] + 1][yCord[2]] == '#')) {
+            return true;
+        } else if(verNo == 4 && (board[xCord[0] + 1][yCord[0]] == '#' || board[xCord[3] + 1][yCord[3]] == '#')){
+            return true;
+        }
+        return false;
     }
 }
 
@@ -145,6 +200,23 @@ class L extends Versions {
             yCord[length - 1] = min - 1;
         }
     }
+    public void generateVer() {
+        xCord = new int[] {1, 2, 3, 3};
+        yCord = new int[] {1, 1, 1, 2};
+    }
+    public boolean checkDown(char board[][]) {
+        if(verNo == 1 && (board[xCord[2] + 1][yCord[2]] == '#' || board[xCord[3] + 1][yCord[3]] == '#')) {
+            return true;
+        } else if(verNo == 2 && ( board[xCord[0] + 1][yCord[0]] == '#' || board[xCord[1] + 1][yCord[1]] == '#' 
+        || board[xCord[2] + 1][yCord[2]] == '#')) {
+            return true;
+        } else if(verNo == 3 && (board[xCord[0] + 1][yCord[0]] == '#' || board[xCord[3] + 1][yCord[3]] == '#')) {
+            return true;
+        } else if(verNo == 4 && (board[xCord[0] + 1][yCord[0]] == '#' || board[xCord[1] + 1][yCord[1]] == '#' || board[xCord[2] + 1][yCord[2]] == '#' )){
+            return true;
+        }
+        return false;
+    }
 }
 
 class Z extends Versions{
@@ -190,10 +262,26 @@ class Z extends Versions{
             }
         }
     }
+    public void generateVer() {
+        xCord = new int[] {1, 2, 2, 3};
+        yCord = new int[] {1, 1, 2, 2};
+    }
+    public boolean checkDown(char board[][]) {
+        if((verNo == 1 || verNo == 3 ) && (board[xCord[1] + 1][yCord[1]] == '#' 
+        || board[xCord[3] + 1][yCord[3]] == '#')) {
+            return true;
+        } else if((verNo == 2 || verNo == 4 ) && 
+        ( board[xCord[0] + 1][yCord[0]] == '#' || board[xCord[2] + 1][yCord[2]] == '#'
+        || board[xCord[3] + 1][yCord[3]] == '#')) {
+            return true;
+        }
+        return false;
+    }
 }
 
 public class Tetris {
     public static char board[][] = new char[30][30];
+    static int currentVer = 1, currentShapeNo = 1;
     public static void main(String args[]) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Lets Start!!!");
@@ -204,18 +292,14 @@ public class Tetris {
         Z z = new Z();
         Versions currentShape = new Versions();
         char dir;
-        int currentVer = 1, currentShapeNo = 3;
+        initBoard();
         while(true) {
-            // currentShapeNo = (int)(Math.random() * 5) + 1;
-            clearBoard();
             currentShape = currentShapeNo == 1 ? line : currentShapeNo == 2 ? square : currentShapeNo == 3 ? t : currentShapeNo == 4 ? l : z;
             drawOnBoard(currentShape);
             displayBoard();
             dir = scanner.next().charAt(0);
             if (dir == 'r') {
-                currentVer++;
-                if(currentVer > 4)
-                    currentVer = 1;
+                currentVer = currentVer > 4 ? 1 : ++currentVer;
                 currentShape.changeVer(currentVer);
             } else if(dir == 'a') {
                 moveLeft(currentShape);
@@ -228,7 +312,7 @@ public class Tetris {
             // System.out.flush();
         }
     }
-    public static void clearBoard() {
+    public static void initBoard() {
         for(int i = 0;i<board.length;i++) {
             for(int j = 0;j<board[i].length;j++) {
                 if(i == 0 || j == 0 || i == board.length - 1 || j == board.length - 1 )
@@ -246,30 +330,37 @@ public class Tetris {
     public static void displayBoard() {
         for(char arr[]:board) {
             for(char a:arr) {
-                System.out.print(a + " ");
+                System.out.print(a);
             }
             System.out.println();
         }
     }
     public static void moveDown(Versions V) {
-        if(V.xCord[0] == 28 || V.xCord[1] == 28 || V.xCord[2] == 28 || V.xCord[3] == 28)
-                return;
+        if(V.xCord[0] == (board.length - 2) || V.xCord[1] == (board.length - 2) || 
+        V.xCord[2] == (board.length - 2) || V.xCord[3] == (board.length - 2) || V.checkDown(board)) {
+            V.generateVer();
+            currentShapeNo = (int)(Math.random() * 5) + 1;
+            return;
+        }
         for(int i = 0;i<V.xCord.length;i++) {
-                V.xCord[i]++;
+            board[V.xCord[i]][V.yCord[i]] = ' ';
+            V.xCord[i]++;
         }
     }
     public static void moveLeft(Versions V) {
         if(V.yCord[0] == 1 || V.yCord[1] == 1 || V.yCord[2] == 1 || V.yCord[3] == 1)
             return;
         for(int i = 0;i<V.xCord.length;i++) {
-                V.yCord[i]--;
+            board[V.xCord[i]][V.yCord[i]] = ' ';
+            V.yCord[i]--;
         }
     }
     public static void moveRight(Versions V) {
-        if(V.yCord[0] == 28 || V.yCord[1] == 28 || V.yCord[2] == 28 || V.yCord[3] == 28)
+        if(V.yCord[0] == (board.length - 2) || V.yCord[1] == (board.length - 2) || V.yCord[2] == (board.length - 2) || V.yCord[3] == (board.length - 2))
             return;
         for(int i = 0;i<V.xCord.length;i++) {
-                V.yCord[i]++;
+            board[V.xCord[i]][V.yCord[i]] = ' ';
+            V.yCord[i]++;
         }
     }
 }
